@@ -42,7 +42,7 @@ button { display: flex; align-items: center; justify-content: center; text-align
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; cursor: pointer;
   transition: border-color 0.2s, color 0.2s; letter-spacing: 0.02em;
 }
-.btn-login:hover { background: rgb(215, 41, 41) !important; border-color: #F4F9FD !important; color: #F4F9FD !important; }
+.btn-login:hover { background: #0f2e66 !important; border-color: #F4F9FD !important; color: #F4F9FD !important; }
 
 .btn-signup {
   background: none !important; border: 1px solid #F4F9FD !important; color: #F4F9FD !important;
@@ -50,7 +50,7 @@ button { display: flex; align-items: center; justify-content: center; text-align
   font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 600; cursor: pointer;
   transition: background 0.2s; letter-spacing: 0.02em;
 }
-.btn-signup:hover { background: rgb(215, 41, 41) !important; border-color: #F4F9FD !important; color: #F4F9FD !important; }
+.btn-signup:hover { background: #0f2e66 !important; border-color: #F4F9FD !important; color: #F4F9FD !important; }
 
 .sidebar-overlay {
   position: fixed; inset: 0; z-index: 90;
@@ -60,7 +60,7 @@ button { display: flex; align-items: center; justify-content: center; text-align
 
 .sidebar {
   position: fixed; top: 64px; left: 0; bottom: 0; width: 260px;
-  background: #fff; border-right: 1px solid #F4F9FD;
+  background: #F4F9FD; border-right: 1px solid #cad6e0;
   transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
   z-index: 200 !important;
 }
