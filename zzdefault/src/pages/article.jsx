@@ -84,7 +84,7 @@ function Article() {
         </div>
         <div className="header-center">
           <button className="btn-logo" onClick={() => navigate("/")}>
-            <img src="/logofanNEOsite.png" style={{ height: "65px", width: "auto" }} />
+            <img src="/logofanSESI.png" style={{ height: "65px", width: "auto" }} />
           </button>
         </div>
         <div className="header-right" />

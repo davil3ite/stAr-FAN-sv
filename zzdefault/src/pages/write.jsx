@@ -13,7 +13,7 @@ const THEMES_VISIBLE = 6;
 const MAX_AUTHORS = 6;
 
 // Nome da edição mostrado na tela de escrever. É só visual: não é salvo no banco.
-const EDITION_LABEL = "Edição Especial";
+const EDITION_LABEL = "SESIVERSO";
 
 const PARAGRAPH_INDENT = "3em";
 
@@ -330,7 +330,7 @@ function Write() {
         </div>
         <div className="header-center">
           <button className="btn-logo" onClick={() => navigate("/")}>
-            <img src="/logofanNEOsite.png" style={{ height: "65px", width: "auto" }} />
+            <img src="/logofanSESI.png" style={{ height: "65px", width: "auto" }} />
           </button>
         </div>
         <div className="header-right" />
