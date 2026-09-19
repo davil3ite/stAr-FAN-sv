@@ -112,7 +112,7 @@ body { font-family: 'DM Sans', sans-serif; min-height: 100vh; background: #F4F9F
   display: flex; align-items: center; justify-content: center;
 }
 .editor-toolbar button:hover { background: #f0f0f0; color: #111; border-color: #ddd; }
-.editor-toolbar button.active { background: #FF1E2D; color: #fff; border-color: rgb(215, 41, 41); }
+.editor-toolbar button.active { background: #164192; color: #fff; border-color: #0f2e66; }
 .editor-toolbar button.active svg { fill: #fff; }
 .toolbar-sep { width: 1px; height: 20px; background: #ddd; margin: 0 4px; }
 
