@@ -208,7 +208,7 @@ button { display: flex; align-items: center; justify-content: center; text-align
 
 .footer {
   height: 48px;
-  background: #FF1E2D !important; border-top: 1px solid rgb(215, 41, 41) !important;
+  background: #164192 !important; border-top: 1px solid #0f2e66 !important;
   display: flex; align-items: center; justify-content: center;
   gap: 12px; padding: 0 32px; z-index: 100;
 }
