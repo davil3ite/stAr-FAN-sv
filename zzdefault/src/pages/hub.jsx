@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
-import { getSession, logout } from "../auth.js";
-import { getArticles, deleteArticle, timeAgo, getEditions } from "../articles.js";
+import { getArticles, timeAgo, getEditions } from "../articles.js";
 import "./css/hub.css";
 
 const INSTAGRAM_URL = "https://www.instagram.com/folha.alfa_news/";
@@ -59,7 +58,6 @@ function AuthorAvatars({ author, coauthors }) {
 function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const [session, setSession] = useState(getSession());
   const [articles, setArticles] = useState([]);
   const [editions, setEditions] = useState([]);
 
@@ -69,23 +67,6 @@ function Layout() {
       setEditions(eds);
     });
   }, []);
-
-  function handleLogout() { logout(); setSession(null); navigate('/'); }
-
-  async function handleDelete(e, id) {
-    e.stopPropagation();
-    if (window.confirm("Tem certeza que quer deletar esta matéria?")) {
-      await deleteArticle(id);
-      setArticles(prev => prev.filter(a => a.id !== id));
-    }
-  }
-
-  function canEdit(article) {
-    if (!session) return false;
-    // Artigos anônimos: só adm+ pode editar
-    if (article.author === "anonymous") return session.type === "adm+";
-    return session.username === article.author.username || session.type === "adm+";
-  }
 
   function groupByEdition(articles, editions) {
     const edMap = {};
@@ -124,23 +105,7 @@ function Layout() {
           </button>
         </div>
         <div className="header-right">
-          {session ? (
-            <>
-              <button className="header-profile-btn" onClick={() => navigate('/profile')}>
-                {session.avatar ? <img src={session.avatar} className="header-avatar" alt="avatar" /> : <div className="header-avatar-placeholder">{session.name[0].toUpperCase()}</div>}
-                <span className="header-username">{session.name}</span>
-              </button>
-              {(session.type === "adm" || session.type === "adm+") && (
-                <button className="btn-write" onClick={() => navigate('/write')}>Escrever</button>
-              )}
-              <button className="btn-login" onClick={handleLogout}>Sair</button>
-            </>
-          ) : (
-            <>
-              <button className="btn-login" onClick={() => navigate('/login')}>Log in</button>
-              <button className="btn-signup" onClick={() => navigate('/signup')}>Sign up</button>
-            </>
-          )}
+          <button className="btn-write" onClick={() => navigate('/write')}>Escrever</button>
         </div>
       </header>
 
@@ -163,17 +128,7 @@ function Layout() {
             <a href={`mailto:${CONTACT_EMAIL}`} className="sidebar-email">{CONTACT_EMAIL}</a>
           </div>
           <div className="sidebar-logsign">
-            {session ? (
-              <>
-                <button className="sb-login" onClick={() => navigate('/profile')}>Perfil</button>
-                <button className="sb-login" onClick={handleLogout}>Sair</button>
-              </>
-            ) : (
-              <>
-                <button className="sb-login" onClick={() => navigate('/login')}>Log in</button>
-                <button className="sb-signup" onClick={() => navigate('/signup')}>Sign up</button>
-              </>
-            )}
+            <button className="sb-signup" onClick={() => navigate('/write')}>Escrever</button>
           </div>
         </div>
       </aside>
@@ -204,12 +159,6 @@ function Layout() {
                         <span>{formatAuthorsText(a.author, a.coauthors)}</span>
                         <span>{timeAgo(a.created_at)}</span>
                       </div>
-                      {canEdit(a) && (
-                        <div className="card-actions" onClick={e => e.stopPropagation()}>
-                          <button className="card-action-btn" onClick={e => { e.stopPropagation(); navigate(`/write/${a.id}`); }} title="Editar">✏️</button>
-                          <button className="card-action-btn delete" onClick={e => handleDelete(e, a.id)} title="Deletar">🗑️</button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}

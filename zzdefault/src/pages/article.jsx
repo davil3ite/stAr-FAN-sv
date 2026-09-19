@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSession } from "../auth.js";
-import { getArticleById, getEditionById, deleteArticle } from "../articles.js";
+import { getArticleById, getEditionById } from "../articles.js";
 import "./css/article.css";
 
 const INSTAGRAM_URL = "https://www.instagram.com/folha.alfa_news/";
@@ -59,7 +58,6 @@ function AuthorAvatars({ author, coauthors }) {
 function Article() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const session = getSession();
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [article, setArticle] = useState(null);
   const [edition, setEdition] = useState(null);
@@ -77,17 +75,6 @@ function Article() {
 
   if (loading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100vh", background:"#f5f5f5" }}><p style={{ color: "#aaa", fontFamily: "Syne, sans-serif" }}>Carregando...</p></div>;
   if (!article) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100vh", background:"#f5f5f5" }}><p style={{ color: "#aaa", fontFamily: "Syne, sans-serif" }}>Matéria não encontrada.</p></div>;
-
-  // Artigos anônimos: só adm+ pode editar/deletar
-  const canEdit = session && (
-    article.author === "anonymous"
-      ? session.type === "adm+"
-      : session.username === article.author.username || session.type === "adm+"
-  );
-
-  async function handleDelete() {
-    if (window.confirm("Tem certeza que quer deletar esta matéria?")) { await deleteArticle(id); navigate("/"); }
-  }
 
   return (
     <div className="article-page">
@@ -127,12 +114,6 @@ function Article() {
                   ))}
                 </ul>
               )}
-            </div>
-          )}
-          {canEdit && (
-            <div className="author-actions">
-              <button className="btn-edit" onClick={() => navigate(`/write/${id}`)}>Editar</button>
-              <button className="btn-delete" onClick={handleDelete}>Deletar</button>
             </div>
           )}
         </div>
