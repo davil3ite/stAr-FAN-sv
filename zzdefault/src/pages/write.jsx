@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createArticle } from "../articles.js";
+import { uploadImage, checkImage } from "../storage.js";
 import "./css/write.css";
 
 const TYPES = ["Notícia", "Reportagem", "Artigo de opinião", "Crônica", "Resenha Crítica"];
@@ -181,13 +182,16 @@ function Write() {
   const [themeOverflowOpen, setThemeOverflowOpen] = useState(false);
   const [headline, setHeadline] = useState("");
   const [body, setBody] = useState("");
-  const [coverImage, setCoverImage] = useState("");
-  const [coverPreview, setCoverPreview] = useState("");
   const [sources, setSources] = useState([{ label: "", url: "" }]);
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [activeFormats, setActiveFormats] = useState({ b: false, i: false, u: false });
   const [activeAlign, setActiveAlign] = useState("Left");
+
+  // Capa: o arquivo fica guardado aqui e só sobe pro Storage ao publicar.
+  // A prévia usa um endereço temporário do próprio navegador.
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState("");
 
   // Autoria: lista de nomes digitados. O primeiro é o autor principal.
   const [authors, setAuthors] = useState([""]);
@@ -196,6 +200,7 @@ function Write() {
   const coverInputRef = useRef(null);
   const inlineInputRef = useRef(null);
   const themeOverflowRef = useRef(null);
+  const coverPreviewRef = useRef("");
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -204,6 +209,11 @@ function Write() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Libera a prévia da capa ao sair da página
+  useEffect(() => () => {
+    if (coverPreviewRef.current) URL.revokeObjectURL(coverPreviewRef.current);
   }, []);
 
   function handleBodyChange() { setBody(bodyRef.current.innerHTML); setError(""); }
@@ -264,10 +274,21 @@ function Write() {
     setBody(bodyRef.current.innerHTML);
   }
 
-  async function handleCoverChange(e) {
-    const file = e.target.files[0]; if (!file) return;
-    const base64 = await fileToBase64(file);
-    setCoverImage(base64); setCoverPreview(base64); setError("");
+  function handleCoverChange(e) {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+
+    const check = checkImage(file);
+    if (!check.ok) { setError(check.error); return; }
+
+    if (coverPreviewRef.current) URL.revokeObjectURL(coverPreviewRef.current);
+    const preview = URL.createObjectURL(file);
+    coverPreviewRef.current = preview;
+
+    setCoverFile(file);
+    setCoverPreview(preview);
+    setError("");
   }
 
   async function handleInlineImage(e) {
@@ -307,12 +328,16 @@ function Write() {
     if (names.length === 0) { setError("Coloque o nome de pelo menos um autor."); return; }
     if (!theme) { setError("Escolha um tema."); return; }
     if (!headline.trim()) { setError("A manchete é obrigatória."); return; }
-    if (!coverImage) { setError("A imagem de capa é obrigatória."); return; }
+    if (!coverFile) { setError("A imagem de capa é obrigatória."); return; }
     if (!body.trim() || body === "<br>") { setError("O texto é obrigatório."); return; }
     if (filledSources.length === 0) { setError("Coloque o link de pelo menos uma fonte."); return; }
 
     setPublishing(true);
     setError("");
+
+    // A capa sobe pro Storage e o que vai pro banco é só o link dela.
+    const upload = await uploadImage(coverFile, "covers");
+    if (!upload.ok) { setPublishing(false); setError(upload.error); return; }
 
     // Autores salvos só pelo nome: { name }. Sem id, o articles.js
     // exibe o nome direto e usa a inicial como foto.
@@ -321,7 +346,7 @@ function Write() {
       theme,
       headline: headline.trim(),
       body,
-      coverImage,
+      coverImage: upload.url,
       images: [],
       sources: filledSources,
       author: { name: names[0] },
