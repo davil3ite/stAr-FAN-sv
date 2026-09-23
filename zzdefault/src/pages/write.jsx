@@ -144,7 +144,8 @@ function IconAlignJustify() {
 
 /* ── Campos de autoria ──
    Uma linha por autor. O primeiro é o autor principal; os demais são
-   co-autores. O "+" fica sempre na última linha e some ao atingir o limite. */
+   co-autores. O "+" fica sempre na última linha e some ao atingir o limite.
+   Campos extras deixados em branco são ignorados na hora de publicar. */
 function AuthorFields({ authors, onChange, onAdd, onRemove, max }) {
   return (
     <div className="write-field">
@@ -205,7 +206,7 @@ function Write() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleBodyChange() { setBody(bodyRef.current.innerHTML); }
+  function handleBodyChange() { setBody(bodyRef.current.innerHTML); setError(""); }
 
   // Tab = recuo de parágrafo; Shift+Tab = remove o recuo
   function handleKeyDown(e) {
@@ -266,7 +267,7 @@ function Write() {
   async function handleCoverChange(e) {
     const file = e.target.files[0]; if (!file) return;
     const base64 = await fileToBase64(file);
-    setCoverImage(base64); setCoverPreview(base64);
+    setCoverImage(base64); setCoverPreview(base64); setError("");
   }
 
   async function handleInlineImage(e) {
@@ -280,7 +281,10 @@ function Write() {
 
   function addSource() { setSources(s => [...s, { label: "", url: "" }]); }
   function removeSource(i) { setSources(s => s.filter((_, idx) => idx !== i)); }
-  function updateSource(i, field, value) { setSources(s => s.map((src, idx) => idx === i ? { ...src, [field]: value } : src)); }
+  function updateSource(i, field, value) {
+    setSources(s => s.map((src, idx) => idx === i ? { ...src, [field]: value } : src));
+    setError("");
+  }
 
   function updateAuthor(i, value) {
     setAuthors(a => a.map((name, idx) => idx === i ? value : name));
@@ -289,11 +293,24 @@ function Write() {
   function addAuthor() { setAuthors(a => a.length < MAX_AUTHORS ? [...a, ""] : a); }
   function removeAuthor(i) { setAuthors(a => a.filter((_, idx) => idx !== i)); }
 
+  function handleSelectTheme(t) {
+    setTheme(theme === t ? null : t);
+    setError("");
+  }
+
   async function handlePublish() {
+    // Todos os campos são obrigatórios. Campos de autor deixados em branco
+    // são ignorados, desde que sobre pelo menos um nome preenchido.
     const names = authors.map(n => n.trim()).filter(Boolean);
+    const filledSources = sources.filter(s => s.url.trim());
+
     if (names.length === 0) { setError("Coloque o nome de pelo menos um autor."); return; }
+    if (!theme) { setError("Escolha um tema."); return; }
     if (!headline.trim()) { setError("A manchete é obrigatória."); return; }
+    if (!coverImage) { setError("A imagem de capa é obrigatória."); return; }
     if (!body.trim() || body === "<br>") { setError("O texto é obrigatório."); return; }
+    if (filledSources.length === 0) { setError("Coloque o link de pelo menos uma fonte."); return; }
+
     setPublishing(true);
     setError("");
 
@@ -306,7 +323,7 @@ function Write() {
       body,
       coverImage,
       images: [],
-      sources: sources.filter(s => s.url.trim()),
+      sources: filledSources,
       author: { name: names[0] },
       coauthors: names.length > 1 ? names.slice(1).map(name => ({ name })) : null,
       editionId: null,
@@ -366,13 +383,13 @@ function Write() {
 
           {/* Tema */}
           <div className="write-field">
-            <label>Tema <span className="optional">(opcional)</span></label>
+            <label>Tema</label>
             <div className="type-options" style={{ position: "relative" }}>
               {visibleThemes.map(t => (
                 <button
                   key={t}
                   className={`type-btn ${theme === t ? "active" : ""}`}
-                  onClick={() => setTheme(theme === t ? null : t)}
+                  onClick={() => handleSelectTheme(t)}
                 >{t}</button>
               ))}
 
@@ -391,7 +408,7 @@ function Write() {
                         <button
                           key={t}
                           className={`theme-overflow-item ${theme === t ? "active" : ""}`}
-                          onClick={() => { setTheme(theme === t ? null : t); setThemeOverflowOpen(false); }}
+                          onClick={() => { handleSelectTheme(t); setThemeOverflowOpen(false); }}
                         >{t}</button>
                       ))}
                     </div>
@@ -449,10 +466,10 @@ function Write() {
 
           {/* Fontes */}
           <div className="write-field">
-            <label>Fontes <span className="optional">(opcional)</span></label>
+            <label>Fontes</label>
             {sources.map((src, i) => (
               <div className="source-row" key={i}>
-                <input type="text" placeholder="Nome da fonte" value={src.label} onChange={e => updateSource(i, "label", e.target.value)} />
+                <input type="text" placeholder="Nome da fonte (opcional)" value={src.label} onChange={e => updateSource(i, "label", e.target.value)} />
                 <input type="text" placeholder="https://..." value={src.url} onChange={e => updateSource(i, "url", e.target.value)} />
                 {sources.length > 1 && <button className="remove-source" onClick={() => removeSource(i)}>✕</button>}
               </div>
