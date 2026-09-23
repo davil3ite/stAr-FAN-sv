@@ -25,15 +25,6 @@ const INFO_TEXTS = {
 
 const PARAGRAPH_INDENT = "3em";
 
-function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = () => res(reader.result);
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
-  });
-}
-
 function applyFormat(tag) {
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
@@ -217,7 +208,6 @@ function Write() {
 
   const bodyRef = useRef(null);
   const coverInputRef = useRef(null);
-  const inlineInputRef = useRef(null);
   const themeOverflowRef = useRef(null);
   const coverPreviewRef = useRef("");
 
@@ -308,15 +298,6 @@ function Write() {
     setCoverFile(file);
     setCoverPreview(preview);
     setError("");
-  }
-
-  async function handleInlineImage(e) {
-    const file = e.target.files[0]; if (!file) return;
-    const base64 = await fileToBase64(file);
-    bodyRef.current.focus();
-    document.execCommand("insertImage", false, base64);
-    setBody(bodyRef.current.innerHTML);
-    e.target.value = "";
   }
 
   function addSource() { setSources(s => [...s, { label: "", url: "" }]); }
@@ -490,9 +471,6 @@ function Write() {
               <button onMouseDown={e => handleAlign(e, "Center")} className={activeAlign === "Center" ? "active" : ""} title="Centralizar"><IconAlignCenter /></button>
               <button onMouseDown={e => handleAlign(e, "Right")} className={activeAlign === "Right" ? "active" : ""} title="Alinhar à direita"><IconAlignRight /></button>
               <button onMouseDown={e => handleAlign(e, "Full")} className={activeAlign === "Full" ? "active" : ""} title="Justificar"><IconAlignJustify /></button>
-              <span className="toolbar-sep" />
-              <button onMouseDown={e => { e.preventDefault(); inlineInputRef.current.click(); }}>🖼</button>
-              <input ref={inlineInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleInlineImage} />
             </div>
             <div
               ref={bodyRef}
