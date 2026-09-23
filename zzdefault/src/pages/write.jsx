@@ -16,6 +16,13 @@ const MAX_AUTHORS = 6;
 // Nome da edição mostrado na tela de escrever. É só visual: não é salvo no banco.
 const EDITION_LABEL = "SESIVERSO";
 
+// Textos que aparecem no "i" ao lado de cada título. Troque aqui.
+const INFO_TEXTS = {
+  headline: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  cover: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
+  sources: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit.",
+};
+
 const PARAGRAPH_INDENT = "3em";
 
 function fileToBase64(file) {
@@ -140,6 +147,18 @@ function IconAlignJustify() {
       <rect x="1" y="9" width="14" height="1.5" rx="0.75"/>
       <rect x="1" y="12.5" width="10" height="1.5" rx="0.75"/>
     </svg>
+  );
+}
+
+/* ── "i" de ajuda ──
+   Bolinha ao lado do título. O popup abre no hover (e no foco pelo teclado)
+   e é posicionado pelo CSS, logo abaixo da bolinha. */
+function InfoTip({ text }) {
+  return (
+    <span className="info-tip">
+      <span className="info-tip-btn" tabIndex={0} role="button" aria-label="Mais informações">i</span>
+      <span className="info-tip-popup" role="tooltip">{text}</span>
+    </span>
   );
 }
 
@@ -445,13 +464,13 @@ function Write() {
 
           {/* Manchete */}
           <div className="write-field">
-            <label>Manchete</label>
+            <label>Manchete<InfoTip text={INFO_TEXTS.headline} /></label>
             <input type="text" placeholder="Título da matéria" value={headline} onChange={e => { setHeadline(e.target.value); setError(""); }} />
           </div>
 
           {/* Imagem de capa */}
           <div className="write-field">
-            <label>Imagem de capa</label>
+            <label>Imagem de capa<InfoTip text={INFO_TEXTS.cover} /></label>
             <input ref={coverInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCoverChange} />
             <button className="file-btn" onClick={() => coverInputRef.current.click()}>
               {coverPreview ? "Trocar imagem de capa" : "Escolher imagem de capa"}
@@ -491,7 +510,7 @@ function Write() {
 
           {/* Fontes */}
           <div className="write-field">
-            <label>Fontes</label>
+            <label>Fontes<InfoTip text={INFO_TEXTS.sources} /></label>
             {sources.map((src, i) => (
               <div className="source-row" key={i}>
                 <input type="text" placeholder="Nome da fonte (opcional)" value={src.label} onChange={e => updateSource(i, "label", e.target.value)} />
