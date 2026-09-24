@@ -87,12 +87,14 @@ body { font-family: 'DM Sans', sans-serif; min-height: 100vh; background: #F4F9F
 }
 .info-tip:hover .info-tip-btn,
 .info-tip-btn:focus-visible { border-color: #164192; color: #164192; }
+/* A largura do popup é o que controla a altura dele: quanto mais largo,
+   menos linhas. O max-width segura o popup dentro da tela em telas estreitas. */
 .info-tip-popup {
   position: absolute; top: calc(100% + 8px); left: -6px; z-index: 300;
-  width: 260px; max-width: calc(100vw - 48px);
+  width: 420px; max-width: calc(100vw - 48px);
   background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  padding: 10px 12px;
+  padding: 12px 14px;
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
   text-transform: none; letter-spacing: 0; line-height: 1.5; color: #555;
   opacity: 0; visibility: hidden; pointer-events: none;
