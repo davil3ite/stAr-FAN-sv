@@ -104,9 +104,9 @@ function Layout() {
             <img src="/logofanSESI.png" style={{ height: "65px", width: "auto" }} />
           </button>
         </div>
-        <div className="header-right">
+        {/* <div className="header-right">
           <button className="btn-write" onClick={() => navigate('/write')}>Escrever</button>
-        </div>
+        </div> */}
       </header>
 
       <div className={`sidebar-overlay ${sidebarOpen ? "visible" : ""}`} onClick={() => setSidebarOpen(false)} />
